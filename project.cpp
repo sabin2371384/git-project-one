@@ -1,7 +1,7 @@
-
 #include <iostream>
 #include <vector>
 #include <string>
+#include <limits> // برای numeric_limits
 
 using namespace std;
 
@@ -40,6 +40,23 @@ struct Student {
                  << ", Units: " << course.units << endl;
         }
     }
+
+    // تابع محاسبه معدل
+    double calculateGPA() {
+        double totalPoints = 0;
+        int totalUnits = 0;
+
+        for (const auto &course : courses) {
+            totalPoints += course.grade * course.units;
+            totalUnits += course.units;
+        }
+
+        if (totalUnits == 0) {
+            return 0; // در صورت نداشتن هیچ واحد درسی، معدل 0 برمی‌گردد.
+        }
+
+        return totalPoints / totalUnits;
+    }
 };
 
 int main() {
@@ -47,13 +64,13 @@ int main() {
 
     // دریافت اطلاعات دانشجو
     cout << "Enter first name: ";
-    cin >> s.firstName;
+    getline(cin, s.firstName); // استفاده از getline برای ورودی رشته با فضای خالی
     cout << "Enter last name: ";
-    cin >> s.lastName;
+    getline(cin, s.lastName);
     cout << "Enter student ID: ";
-    cin >> s.studentID;
+    getline(cin, s.studentID);
     cout << "Enter major: ";
-    cin >> s.major;
+    getline(cin, s.major);
 
     s.displayInfo();
 
@@ -61,8 +78,8 @@ int main() {
     int numCourses;
     cout << "Enter number of courses: ";
     cin >> numCourses;
-    
-    cin.ignore(); 
+
+    cin.ignore(); // پاک کردن بافر ورودی برای استفاده از getline بعدی
 
     for (int i = 0; i < numCourses; i++) {
         string cname;
@@ -75,25 +92,27 @@ int main() {
         cout << "Enter grade: ";
         while (!(cin >> cgrade) || cgrade < 0 || cgrade > 20) {
             cout << "Invalid grade! Enter again (0-20): ";
-            cin.clear(); // پاک کردن فلگ خطا
+            cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // حذف داده‌های نامعتبر از بافر
         }
 
         cout << "Enter units: ";
         while (!(cin >> cunits) || cunits <= 0) {
             cout << "Invalid units! Enter again (must be positive): ";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
         }
 
-        cin.ignore(); 
+        cin.ignore();
 
         s.addCourse(cname, cgrade, cunits);
-      // افزودن درس به لیست دانشجو
     }
 
-    // نمایش اطلاعات دروس دانشجو
     s.displayCourses();
+
+    // محاسبه و نمایش معدل دانشجو
+    double gpa = s.calculateGPA();
+    cout << "\nGPA: " << gpa << endl;
 
     return 0;
 }
