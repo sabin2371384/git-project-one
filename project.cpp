@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,8 +16,9 @@ struct Student {
     string lastName;
     string studentID;
     string major;
-    vector<Course> courses ;
-};
+    vector<Course> courses;
+
+    // تابع افزودن درس
     void addCourse(string cname, double cgrade, int cunits) {
         courses.push_back({cname, cgrade, cunits});
     }
@@ -27,6 +29,16 @@ struct Student {
         cout << "Name: " << firstName << " " << lastName << endl;
         cout << "Major: " << major << endl;
         cout << "Student ID: " << studentID << "\n";
+    }
+
+    // تابع نمایش اطلاعات دروس دانشجو
+    void displayCourses() {
+        cout << "\nStudent Courses:\n";
+        for (const auto &course : courses) {
+            cout << "Course Name: " << course.courseName 
+                 << ", Grade: " << course.grade 
+                 << ", Units: " << course.units << endl;
+        }
     }
 };
 
@@ -45,11 +57,12 @@ int main() {
 
     s.displayInfo();
 
+    // دریافت تعداد دروس
     int numCourses;
     cout << "Enter number of courses: ";
     cin >> numCourses;
     
-    cin.ignore();
+    cin.ignore(); 
 
     for (int i = 0; i < numCourses; i++) {
         string cname;
@@ -60,20 +73,27 @@ int main() {
         getline(cin, cname); 
 
         cout << "Enter grade: ";
-        cin >> cgrade;
+        while (!(cin >> cgrade) || cgrade < 0 || cgrade > 20) {
+            cout << "Invalid grade! Enter again (0-20): ";
+            cin.clear(); // پاک کردن فلگ خطا
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // حذف داده‌های نامعتبر از بافر
+        }
 
         cout << "Enter units: ";
-        cin >> cunits;
-        cin.ignore();
+        while (!(cin >> cunits) || cunits <= 0) {
+            cout << "Invalid units! Enter again (must be positive): ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
 
-        s.addCourse(cname, cgrade, cunits); 
+        cin.ignore(); 
+
+        s.addCourse(cname, cgrade, cunits);
+      // افزودن درس به لیست دانشجو
     }
 
     // نمایش اطلاعات دروس دانشجو
-    cout << "\nStudent Courses:\n";
-    for (const auto &course : s.courses) {
-        cout << "Course Name: " << course.courseName << ", Grade: " << course.grade << ", Units: " << course.units << endl;
-    }
+    s.displayCourses();
 
     return 0;
 }
