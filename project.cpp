@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <limits> // برای numeric_limits
+#include <iomanip> // برای تنظیم عرض و دقت نمایش مقادیر
 
 using namespace std;
 
@@ -24,25 +24,15 @@ struct Student {
     }
 
     // تابع نمایش اطلاعات دانشجو
-    void displayInfo() {
+    void displayInfo() const {
         cout << "\nStudent Information:\n";
         cout << "Name: " << firstName << " " << lastName << endl;
         cout << "Major: " << major << endl;
         cout << "Student ID: " << studentID << "\n";
     }
 
-    // تابع نمایش اطلاعات دروس دانشجو
-    void displayCourses() {
-        cout << "\nStudent Courses:\n";
-        for (const auto &course : courses) {
-            cout << "Course Name: " << course.courseName 
-                 << ", Grade: " << course.grade 
-                 << ", Units: " << course.units << endl;
-        }
-    }
-
     // تابع محاسبه معدل
-    double calculateGPA() {
+    double calculateGPA() const {
         double totalPoints = 0;
         int totalUnits = 0;
 
@@ -57,62 +47,100 @@ struct Student {
 
         return totalPoints / totalUnits;
     }
+
+    // تابع نمایش کارنامه دانشجو
+    void displayTranscript() const {
+        double gpa = calculateGPA();
+        
+        // نمایش  کارنامه
+        cout << "\n----------------------------\n";
+        cout << "       Student Transcript\n";
+        cout << "----------------------------\n";
+        cout << "Name: " << firstName << " " << lastName << endl;
+        cout << "Student ID: " << studentID << endl;
+        cout << "Major: " << major << endl;
+        cout << "GPA: " << fixed << setprecision(2) << gpa << endl;
+        cout << "\nCourses:\n";
+        cout << "---------------------------------\n";
+        cout << "| Course Name        | Units | Grade |\n";
+        cout << "---------------------------------\n";
+        
+        // نمایش دروس
+        for (const auto& course : courses) {
+            cout << "| " << left << setw(18) << course.courseName
+                 << "| " << setw(5) << course.units
+                 << "| " << setw(6) << course.grade << " |\n";
+        }
+
+        cout << "---------------------------------\n";
+    }
 };
 
 int main() {
-    Student s;
+    int numStudents;
+    cout << "Enter number of students: ";
+    cin >> numStudents;
 
-    // دریافت اطلاعات دانشجو
-    cout << "Enter first name: ";
-    getline(cin, s.firstName); // استفاده از getline برای ورودی رشته با فضای خالی
-    cout << "Enter last name: ";
-    getline(cin, s.lastName);
-    cout << "Enter student ID: ";
-    getline(cin, s.studentID);
-    cout << "Enter major: ";
-    getline(cin, s.major);
+    vector<Student> students; // وکتور برای ذخیره دانشجویان
 
-    s.displayInfo();
+    // دریافت اطلاعات دانشجویان
+    for (int i = 0; i < numStudents; i++) {
+        Student s;  
 
-    // دریافت تعداد دروس
-    int numCourses;
-    cout << "Enter number of courses: ";
-    cin >> numCourses;
+        cout << "\nEnter information for student #" << i + 1 << ":\n";
 
-    cin.ignore(); // پاک کردن بافر ورودی برای استفاده از getline بعدی
+        // دریافت اطلاعات دانشجو
+        cout << "Enter first name: ";
+        cin.ignore();  
+        getline(cin, s.firstName);
+        cout << "Enter last name: ";
+        getline(cin, s.lastName);
+        cout << "Enter student ID: ";
+        getline(cin, s.studentID);
+        cout << "Enter major: ";
+        getline(cin, s.major);
 
-    for (int i = 0; i < numCourses; i++) {
-        string cname;
-        double cgrade;
-        int cunits;
+        s.displayInfo();
 
-        cout << "\nEnter course name: ";
-        getline(cin, cname); 
-
-        cout << "Enter grade: ";
-        while (!(cin >> cgrade) || cgrade < 0 || cgrade > 20) {
-            cout << "Invalid grade! Enter again (0-20): ";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // حذف داده‌های نامعتبر از بافر
-        }
-
-        cout << "Enter units: ";
-        while (!(cin >> cunits) || cunits <= 0) {
-            cout << "Invalid units! Enter again (must be positive): ";
-            cin.clear(); 
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-        }
+        // دریافت تعداد دروس
+        int numCourses;
+        cout << "Enter number of courses: ";
+        cin >> numCourses;
 
         cin.ignore();
 
-        s.addCourse(cname, cgrade, cunits);
+        for (int j = 0; j < numCourses; j++) {
+            string cname;
+            double cgrade;
+            int cunits;
+
+            cout << "\nEnter course name: ";
+            getline(cin, cname); 
+
+            cout << "Enter grade: ";
+            while (!(cin >> cgrade) || cgrade < 0 || cgrade > 20) {
+                cout << "Invalid grade! Enter again (0-20): ";
+                cin.clear(); 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            }
+
+            cout << "Enter units: ";
+            while (!(cin >> cunits) || cunits <= 0) {
+                cout << "Invalid units! Enter again (must be positive): ";
+                cin.clear(); 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+
+            cin.ignore(); 
+
+            s.addCourse(cname, cgrade, cunits);
+        }
+
+        students.push_back(s); 
+
+        // نمایش کارنامه هر دانشجو بلافاصله بعد از وارد کردن اطلاعات دروس
+        s.displayTranscript(); 
     }
-
-    s.displayCourses();
-
-    // محاسبه و نمایش معدل دانشجو
-    double gpa = s.calculateGPA();
-    cout << "\nGPA: " << gpa << endl;
 
     return 0;
 }
