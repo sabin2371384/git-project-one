@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <iomanip> // برای تنظیم عرض و دقت نمایش مقادیر
+#include <iomanip> 
 
 using namespace std;
 
